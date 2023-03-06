@@ -35,11 +35,12 @@ pub struct LogLift{
 
 
 
-#[post("/workout/{id}/articles")]
+#[post("/workout/{id}/lifts")]
 pub async fn log_user_workout(state: Data<AppState>, path: Path<i32>, body: Json<LogLift>) -> impl Responder{
     let id:i32 = path.into_inner();
     
-    match sqlx::query_as::<_, Lift>( "INSERT INTO lifts (lift, weight, reps, rpe, time) VALUES ($1, $2, $3, $4, $5) RETURNING id, lift, weight, reps, rpe, time")
+    match sqlx::query_as::<_, Lift>( "INSERT INTO lifts (id, lift, weight, reps, rpe, time) VALUES ($1, $2, $3, $4, $5) RETURNING id, lift, weight, reps, rpe, time")
+        .bind(id)
         .bind(body.lift.to_string())
         .bind(body.weight)
         .bind(body.reps)
@@ -50,4 +51,21 @@ pub async fn log_user_workout(state: Data<AppState>, path: Path<i32>, body: Json
             Ok(lift) => HttpResponse::Ok().json(lift),
             Err(_) => HttpResponse::InternalServerError().json("Failed to create user lift"),
         }
+}
+
+#[get("/workout/{id}/lifts")]
+pub async fn pull_user_lifts(state: Data<AppState>, path: Path<i32>) -> impl Responder{
+    let id:i32 = path.into_inner();
+
+    match sqlx::query_as::<_, Lift>(
+        "SELECT id, lift, weight, reps, rpe, time FROM articles WHERE id = $1"
+    )
+        .bind(id)
+        .fetch_all(&state.db)
+        .await
+    {
+        Ok(lift) => HttpResponse::Ok().json(articles),
+        Err(_) => HttpResponse::NotFound().json("No lifts found"),
+    }
+
 }
