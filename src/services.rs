@@ -64,7 +64,7 @@ pub async fn pull_user_lifts(state: Data<AppState>, path: Path<i32>) -> impl Res
         .fetch_all(&state.db)
         .await
     {
-        Ok(lift) => HttpResponse::Ok().json(articles),
+        Ok(lift) => HttpResponse::Ok().json(lift),
         Err(_) => HttpResponse::NotFound().json("No lifts found"),
     }
 

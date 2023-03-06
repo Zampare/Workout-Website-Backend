@@ -3,7 +3,7 @@ extern crate pretty_env_logger;
 use sqlx::{query, PgPool, Pool, postgres::PgPoolOptions, Postgres};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Error};
 mod services;
-use services::{self, log_user_workout};
+use services::{self, log_user_workout, pull_user_lifts};
 pub struct AppState {
     db: Pool<Postgres>
 }
@@ -20,6 +20,7 @@ async fn main() -> std::io::Result<()>{
         App::new()
             .app_data(web::Data::new(AppState{db: pool.clone()}))
             .service(log_user_workout)
+            .service(pull_user_lifts)
             /*.service()
             .service()*/
     })
