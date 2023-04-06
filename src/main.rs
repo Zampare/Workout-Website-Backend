@@ -16,6 +16,8 @@ async fn main() -> std::io::Result<()>{
         .max_connections(5)
         .connect(&db_url)
         .await.expect("Error building a connection pool");
+    let result = sqlx::query("CREATE TABLE IF NOT EXISTS lifts (id SERIAL PRIMARY KEY NOT NULL, lift VARCHAR(250) NOT NULL, reps INTEGER, weight INTEGER, rpe INTEGER, time TIMESTAMPTZ);").execute(&pool).await.unwrap();
+    println!("Create user table result: {:?}", result);
     HttpServer::new(move ||{
         App::new()
             .app_data(web::Data::new(AppState{db: pool.clone()}))
