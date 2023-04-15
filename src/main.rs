@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()>{
             .app_data(web::Data::new(AppState{db: pool.clone()}))
             .service(log_user_workout)
             .service(pull_user_lifts)
-            .service(fs::Files::new("/", "./dist").show_files_listing())
+            .service(fs::Files::new("/", "./dist").index_file("index.html"))
             /*.service()
             .service()*/
     })
