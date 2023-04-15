@@ -35,7 +35,7 @@ pub struct LogLift{
 
 
 
-#[post("/workout/lifts")]
+#[post("/api/workout/lifts")]
 pub async fn log_user_workout(state: Data<AppState>, body: Json<LogLift>) -> impl Responder{
     
     match sqlx::query_as::<_, Lift>( "INSERT INTO lifts (lift, weight, reps, rpe, time) VALUES ($1, $2, $3, $4, $5) RETURNING id, lift, weight, reps, rpe, time")
@@ -50,8 +50,7 @@ pub async fn log_user_workout(state: Data<AppState>, body: Json<LogLift>) -> imp
             Err(e) => {println!("{:?}", e);HttpResponse::InternalServerError().json("Failed to create user lift")},
         }
 }
-
-#[get("/workout/lifts")]
+#[get("/api/workout/lifts")]
 pub async fn pull_user_lifts(state: Data<AppState>) -> impl Responder{
 
     match sqlx::query_as::<_, Lift>(

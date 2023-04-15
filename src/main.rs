@@ -4,6 +4,8 @@ use sqlx::{query, PgPool, Pool, postgres::PgPoolOptions, Postgres};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Error};
 mod services;
 use services::{log_user_workout, pull_user_lifts};
+use actix_files as fs;
+
 pub struct AppState {
     db: Pool<Postgres>
 }
@@ -23,6 +25,7 @@ async fn main() -> std::io::Result<()>{
             .app_data(web::Data::new(AppState{db: pool.clone()}))
             .service(log_user_workout)
             .service(pull_user_lifts)
+            .service(fs::Files::new("/", "./dist").show_files_listing())
             /*.service()
             .service()*/
     })
