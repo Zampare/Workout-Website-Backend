@@ -54,7 +54,7 @@ pub async fn log_user_workout(state: Data<AppState>, body: Json<LogLift>) -> imp
 pub async fn pull_user_lifts(state: Data<AppState>) -> impl Responder{
 
     match sqlx::query_as::<_, Lift>(
-        "SELECT * FROM lifts"
+        "SELECT * FROM lifts order by time"
     )
         .fetch_all(&state.db)
         .await
