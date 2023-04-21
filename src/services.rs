@@ -11,7 +11,7 @@ struct User{
     last_name: String,
 }
 
-#[derive(Serialize, FromRow)]
+#[derive(Serialize, FromRow, Deserialize)]
 struct Lift{
     id:i32,
     lift: String,
@@ -54,7 +54,7 @@ pub async fn log_user_workout(state: Data<AppState>, body: Json<LogLift>) -> imp
 pub async fn pull_user_lifts(state: Data<AppState>) -> impl Responder{
 
     match sqlx::query_as::<_, Lift>(
-        "SELECT * FROM lifts order by time"
+        "SELECT * FROM lifts ORDER by time"
     )
         .fetch_all(&state.db)
         .await
@@ -64,3 +64,21 @@ pub async fn pull_user_lifts(state: Data<AppState>) -> impl Responder{
     }
 
 }//{"lift":"BENCH","weight":225,"reps":3,"rpe":9,"time":"2023-04-05T18:44:00Z"}
+#[post("/api/workout/lifts/edit")]
+pub async fn edit_workout(state: Data<AppState>, body: Json<Lift>) -> impl Responder{
+
+    match sqlx::query_as::<_, Lift>( "UPDATE lifts SET lift = $1, weight = $2, reps = $3, rpe = $4, time = $5 WHERE id = $6 RETURNING id, lift, weight, reps, rpe, time")
+        .bind(body.lift.to_string())
+        .bind(body.weight)
+        .bind(body.reps)
+        .bind(body.rpe)
+        .bind(body.time)
+        .bind(body.id)
+        .fetch_one(&state.db)
+        .await
+        {
+            Ok(lift) => HttpResponse::Ok().json(lift),
+            Err(e) => {println!("{:?}", e);HttpResponse::NotFound().json("Error editing Lift")},
+        }
+
+}

@@ -3,7 +3,7 @@ extern crate pretty_env_logger;
 use sqlx::{query, PgPool, Pool, postgres::PgPoolOptions, Postgres};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Error};
 mod services;
-use services::{log_user_workout, pull_user_lifts};
+use services::{log_user_workout, pull_user_lifts, edit_workout};
 use actix_files as fs;
 
 pub struct AppState {
@@ -26,6 +26,7 @@ async fn main() -> std::io::Result<()>{
             .service(log_user_workout)
             .service(pull_user_lifts)
             .service(fs::Files::new("/", "./dist").index_file("index.html"))
+            .service(edit_workout)
             /*.service()
             .service()*/
     })
