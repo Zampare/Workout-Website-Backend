@@ -82,3 +82,14 @@ pub async fn edit_workout(state: Data<AppState>, body: Json<Lift>) -> impl Respo
         }
 
 }
+/*#[post("/api/workout/lifts/delete")]
+pub async fn del_workout(state: Data<AppState>, body: Json<i32>) -> impl Responder{
+    match sqlx::query_as::<_, Lift>(
+        "SELECT * FROM lifts ORDER by time"
+    )
+        .fetch_all(&state.db)
+        .await
+    {
+        Ok(lift) => HttpResponse::Ok().json(lift),
+        Err(e) => {println!("{:?}", e);HttpResponse::NotFound().json("No lifts found")},
+}*/
