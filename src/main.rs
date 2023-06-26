@@ -5,9 +5,6 @@ use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Error}
 mod services;
 use services::{log_user_workout, pull_user_lifts, edit_workout};
 use actix_files as fs;
-use actix_web::middleware::Logger;
-use env_logger::Env;
-
 
 
 pub struct AppState {
@@ -15,7 +12,6 @@ pub struct AppState {
 }
 #[actix_web::main]
 async fn main() -> std::io::Result<()>{
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
     dotenv::dotenv().ok();
     pretty_env_logger::init();
     let db_url = std::env::var("DATABASE_URL").unwrap();
@@ -27,11 +23,10 @@ async fn main() -> std::io::Result<()>{
     println!("Create user table result: {:?}", result);
     HttpServer::new(move ||{
         App::new()
-            .wrap(Logger::default())
             .app_data(web::Data::new(AppState{db: pool.clone()}))
             .service(log_user_workout)
             .service(pull_user_lifts)
-            .service(fs::Files::new("/", "./dist/").index_file("index.html"))
+            .service(fs::Files::new("/", "./dist").index_file("index.html"))
             .service(edit_workout)
             /*.service()
             .service()*/
